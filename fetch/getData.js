@@ -41,3 +41,13 @@ export async function getBlogData() {
     });
 
 }
+
+export async function getPostData({slug}){
+    const posts = await getBlogData();
+    return posts.find(post => post.slug === slug);
+}
+
+export async function getCategoryPosts({id}){
+    const posts = await getBlogData();
+    return posts.filter(post => post.category_id === id);
+}
