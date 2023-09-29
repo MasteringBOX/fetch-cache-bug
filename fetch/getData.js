@@ -1,8 +1,6 @@
 import getAPI from "./getAPI";
 import { cache } from 'react';
 
-
-
 const getCachedData = cache(async function getData({type, pages = 1, orderBy = "", order = ""}) {
 
     if(pages === 1) {
