@@ -35,30 +35,28 @@ const getCachedData = cache(async function getData({type, pages = 1, orderBy = "
 });
 
 export async function getPosts(lang) {
-    return getCachedData({lang, type: "posts", pages: 5}); // Fetches 5 pages with 50 posts per page. (Total posts 205).
+    return getCachedData({lang, type: "posts", pages: 1}); // Fetches 5 pages with 50 posts per page. (Total posts 205).
 }
 export async function getCategories() {
     return getCachedData({type: "categories", pages: 1, orderBy: "count", order:"desc"});
 }
 
 export async function getTags() {
-    return getCachedData({type: "tags", pages: 5, orderBy: "count", order:"desc"});
+    return getCachedData({type: "tags", pages: 1, orderBy: "count", order:"desc"});
 }
 
+/**
+ * Removed promises to do sequential requests.
+ */
 export async function getBlogData() {
-    const promises = [];
-    promises.push(getCategories());
-    promises.push(getPosts());
+    const categories = await getCategories();
+    const posts = await getPosts();
 
-    return await Promise.all(promises).then(([categories, posts]) => {
-
-        return posts.map((post) => {
-            const category = categories.find(item => item.id === post.category_id);
-            if(category !== undefined) post.category = category.name;
-            return post;
-        })
+    return posts.map((post) => {
+        const category = categories.find(item => item.id === post.category_id);
+        if(category !== undefined) post.category = category.name;
+        return post;
     });
-
 }
 
 export async function getPostData({slug}){
