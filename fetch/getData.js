@@ -3,11 +3,26 @@ import { cache } from 'react';
 
 const getCachedData = cache(async function getData({type, pages = 1, orderBy = "", order = ""}) {
 
-    if(pages === 1) {
-        return getAPI({type, page: pages, order:order, orderBy: orderBy});
+    if (pages === 1) {
+        return getAPI({type, page: pages, order: order, orderBy: orderBy});
     }
 
-    const promises = [];
+    const results = [];
+
+    /**  Doing sequential requests seems to solve the issue.
+     * But fetch is still calling the API twice from generateStaticParams and from the Page.
+     * It should cache the result and not call the API twice.
+      */
+
+
+    for (let i = 1; i < pages + 1; i++) {
+        results.push(await getAPI({type, page: i, order: order, orderBy: orderBy}));
+    }
+
+    return results.flat();
+
+
+    /*const promises = [];
 
     for (let i = 1; i < pages+1; i++){
         promises.push(getAPI({type, page: i, order: order, orderBy:orderBy}));
@@ -15,7 +30,7 @@ const getCachedData = cache(async function getData({type, pages = 1, orderBy = "
 
     const results = await Promise.all(promises);
 
-    return results.flat();
+    return results.flat(); */
 
 });
 
@@ -24,6 +39,10 @@ export async function getPosts(lang) {
 }
 export async function getCategories() {
     return getCachedData({type: "categories", pages: 1, orderBy: "count", order:"desc"});
+}
+
+export async function getTags() {
+    return getCachedData({type: "tags", pages: 5, orderBy: "count", order:"desc"});
 }
 
 export async function getBlogData() {
@@ -50,4 +69,21 @@ export async function getPostData({slug}){
 export async function getCategoryPosts({id}){
     const posts = await getBlogData();
     return posts.filter(post => post.category_id === id);
+}
+
+export async function getTagPosts({lang, id}){
+    const posts = await getBlogData(lang);
+    return posts.filter(post => {
+        return post.tags.find(tag => tag === id);
+    });
+}
+
+export async function getCategory({slug}) {
+    const categories = await getCategories();
+    return categories.find(category => category.slug === slug);
+}
+
+export async function getTag({slug}) {
+    const tags = await getTags();
+    return tags.find(tag => tag.slug === slug);
 }
