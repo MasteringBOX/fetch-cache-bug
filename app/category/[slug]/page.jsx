@@ -1,7 +1,6 @@
 import {getCategories, getCategory, getCategoryPosts, getPosts} from "../../../fetch/getData";
 
 export async function generateStaticParams() {
-
     const posts = await getCategories();
 
     return posts.map((post) => ({

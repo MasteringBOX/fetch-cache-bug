@@ -2,7 +2,7 @@ import {getBlogData, getCategories, getCategoryPosts} from "../../fetch/getData"
 
 
 export default async function Category() {
-
+    return <div>Test</div>
     const categories = await getCategories();
 
     const promises = categories.slice(0, 20).map(async (category) => ({

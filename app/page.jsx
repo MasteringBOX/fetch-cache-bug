@@ -2,7 +2,7 @@ import {getBlogData} from "../fetch/getData";
 
 
 export default async function Home() {
-
+    return <div>Test</div>;
   const data = await getBlogData();
   const posts = data.slice(0, 100); // Show 100 for the sake of the test.
   return (
